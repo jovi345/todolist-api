@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/todos-api/jovi345/router"
@@ -16,9 +14,5 @@ func main() {
 
 	r := router.RegisterRoute()
 
-	host := os.Getenv("HOST")
-	port := os.Getenv("PORT")
-	url := fmt.Sprintf("%v:%v", host, port)
-
-	r.Run(url)
+	r.Run(":8080")
 }

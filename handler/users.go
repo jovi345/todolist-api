@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/todos-api/jovi345/formatter"
@@ -70,7 +71,16 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("refresh_token", refreshToken, int(7*24*3600), "/", "", false, true)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		Domain:   "",
+		Expires:  time.Now().Add(7 * 24 * time.Hour),
+		MaxAge:   int(7 * 24 * 3600),
+		Secure:   true,
+		HttpOnly: true,
+	})
 
 	msg := formatter.SendResponse("Success", accessToken)
 	c.JSON(http.StatusOK, msg)
@@ -79,7 +89,6 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 func (h *userHandler) RefreshToken(c *gin.Context) {
 	cookie, err := c.Request.Cookie("refresh_token")
 	if err != nil {
-		c.SetCookie("refresh_token", "", -1, "/", "", false, true)
 		msg := formatter.SendResponse("Failed", err.Error())
 		c.JSON(http.StatusBadRequest, msg)
 		return
